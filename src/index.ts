@@ -20,7 +20,11 @@ app.use("/api/v1", router);
 const PORT = process.env.PORT ?? 5138;
 
 const startServer = async () => {
-  await dbClient.$connect();
+  await dbClient
+    .$connect()
+    .catch(() =>
+      console.log(`database failed to connect for some reason. should we bail?`)
+    );
   app.listen(PORT, () =>
     console.log(`invoice-api is listening on port :${PORT}`)
   );

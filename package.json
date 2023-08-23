@@ -7,7 +7,7 @@
     "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/dist/index.js"
+    "start": "prisma generate && node src/dist/index.js"
   },
   "keywords": [],
   "author": "",
