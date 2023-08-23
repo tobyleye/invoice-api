@@ -1,5 +1,5 @@
 import { dbClient } from "../db";
-import { object, string, number, array } from "yup";
+import { object, string, number, array, date } from "yup";
 import { Handler } from "../types";
 
 let parseInvoiceItemList = (invoice: any) => {
@@ -51,7 +51,7 @@ const createInvoice: Handler = async (req, res) => {
     clientPostCode: string().required(),
     clientCountry: string().required(),
     projectDescription: string(),
-    invoiceDate: string().required(),
+    invoiceDate: date().required(),
     itemList: array(
       object({
         name: string().required(),
@@ -89,7 +89,7 @@ const createInvoice: Handler = async (req, res) => {
         clientPostCode: invoice.clientPostCode,
         clientCountry: invoice.clientCountry,
         itemList: JSON.stringify(invoice.itemList),
-        invoiceDate: invoice.invoiceDate,
+        invoiceDate: new Date(invoice.invoiceDate),
         projectDescription: invoice.projectDescription,
         userId: userId,
       },

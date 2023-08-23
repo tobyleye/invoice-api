@@ -1,9 +1,10 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router, Response, NextFunction } from "express";
 import * as invoiceHandlers from "./handlers/invoice";
 import * as authHandlers from "./handlers/auth";
 import jwt from "jsonwebtoken";
 import { config } from "./config";
 import { dbClient } from "./db";
+import { Request } from "./types";
 
 const router = Router();
 
@@ -30,7 +31,7 @@ async function verifyToken(req: Request, res: Response, next: NextFunction) {
 
   try {
     let userId = jwt.verify(token, config.JWT_SECRET_KEY) as string;
-    if (userId === undefined) {
+    if (userId) {
       let user = await dbClient.user.findFirst({
         where: { id: userId },
         select: {
