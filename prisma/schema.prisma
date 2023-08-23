@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum InvoiceStatus {
+  draft
+  pending
+  paid
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  invoices  Invoice[]
+}
+
+model Invoice {
+  id                    String        @id @default(uuid())
+  billFromStreetAddress String
+  billFromCity          String
+  billFromPostCode      String
+  country               String
+  status                InvoiceStatus @default(pending)
+  clientName            String
+  clientEmail           String
+  clientStreetAddress   String
+  clientCity            String
+  clientPostCode        String
+  clientCountry         String
+  invoiceDate           DateTime
+  projectDescription    String?
+  createdAt             DateTime      @default(now())
+  itemList              Json
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
