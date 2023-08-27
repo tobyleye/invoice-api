@@ -8,6 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.disable("x-powered-by");
 
 // define index route
 app.get("/", (req, res) => {

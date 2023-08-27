@@ -9,7 +9,7 @@ const BodyValidator = (schema: ObjectSchema<AnyObject>) => {
       next();
     } catch (err: any) {
       return res
-        .status(500)
+        .status(400)
         .json({ message: "validation error", errors: err.errors });
     }
   };
@@ -26,7 +26,7 @@ export const validateSignup = BodyValidator(
 export const validateLogin = BodyValidator(
   object({
     email: string().email().required(),
-    password: string().min(6).required(),
+    password: string().required(),
   })
 );
 
