@@ -25,6 +25,7 @@ const startServer = async () => {
     .catch(() =>
       console.log(`database failed to connect for some reason. should we bail?`)
     );
+
   app.listen(PORT, () =>
     console.log(`invoice-api is listening on port :${PORT}`)
   );

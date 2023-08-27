@@ -1,4 +1,3 @@
-import { object, string } from "yup";
 import { Handler } from "../types";
 import { dbClient } from "../db";
 import bcrypt from "bcrypt";
@@ -8,19 +7,7 @@ import { config } from "../config";
 const SALT_ROUNDS = 10;
 
 export const register: Handler = async (req, res, next) => {
-  let user;
-  try {
-    let registerSchema = object({
-      name: string().required(),
-      email: string().email().required(),
-      password: string().min(6).required(),
-    });
-    user = await registerSchema.validate(req.body);
-  } catch (err: any) {
-    return res
-      .status(500)
-      .json({ message: "validation error", errors: err.errors });
-  }
+  const user = req.body;
   try {
     let existingUser = await dbClient.user.findFirst({
       where: {
@@ -56,7 +43,6 @@ export const register: Handler = async (req, res, next) => {
       },
     });
   } catch (err) {
-    console.log("error --", err);
     res.status(500).json({
       message: "unable to create an account at the moment. try again?",
     });
@@ -64,47 +50,41 @@ export const register: Handler = async (req, res, next) => {
 };
 
 export const login: Handler = async (req, res) => {
-  let user;
+  const user = req.body;
   try {
-    let registerSchema = object({
-      email: string().email().required(),
-      password: string().min(6).required(),
+    let searchedUser = await dbClient.user.findFirst({
+      where: {
+        email: user.email,
+      },
     });
-    user = await registerSchema.validate(req.body);
-  } catch (err: any) {
-    return res
-      .status(500)
-      .json({ message: "validation error", errors: err.errors });
-  }
 
-  let searchedUser = await dbClient.user.findFirst({
-    where: {
-      email: user.email,
-    },
-  });
+    let credentialsValid = false;
 
-  let credentialsValid = false;
+    if (searchedUser) {
+      credentialsValid = await bcrypt.compare(
+        user.password,
+        searchedUser.password
+      );
+    }
 
-  if (searchedUser) {
-    credentialsValid = await bcrypt.compare(
-      user.password,
-      searchedUser.password
-    );
-  }
+    if (credentialsValid === false) {
+      return res.status(401).json({
+        message: `account doesn't exist`,
+      });
+    }
 
-  if (credentialsValid === false) {
-    return res.status(401).json({
-      message: `account doesn't exist`,
+    searchedUser = searchedUser!;
+
+    return res.json({
+      user: {
+        email: searchedUser?.email,
+        name: searchedUser?.name,
+      },
+      token: jwt.sign(searchedUser.id, config.JWT_SECRET_KEY),
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "unable to sign in at the moment. try again?",
     });
   }
-
-  searchedUser = searchedUser!;
-
-  return res.json({
-    user: {
-      email: searchedUser?.email,
-      name: searchedUser?.name,
-    },
-    token: jwt.sign(searchedUser.id, config.JWT_SECRET_KEY),
-  });
 };

@@ -1,5 +1,4 @@
 import { dbClient } from "../db";
-import { object, string, number, array, date } from "yup";
 import { Handler } from "../types";
 
 let parseInvoiceItemList = (invoice: any) => {
@@ -39,37 +38,8 @@ const getInvoice: Handler = async (req, res) => {
 };
 
 const createInvoice: Handler = async (req, res) => {
-  let invoiceSchema = object({
-    billFromCity: string().required(),
-    billFromStreetAddress: string().required(),
-    billFromPostCode: string().required(),
-    country: string().required(),
-    clientName: string().required(),
-    clientEmail: string().email().required(),
-    clientStreetAddress: string().required(),
-    clientCity: string().required(),
-    clientPostCode: string().required(),
-    clientCountry: string().required(),
-    projectDescription: string(),
-    invoiceDate: date().required(),
-    itemList: array(
-      object({
-        name: string().required(),
-        quantity: number().default(1),
-        price: number().required(),
-      })
-    ),
-  });
-
-  let invoice;
+  let invoice = req.body;
   let { saveAsDraft = false } = req.params;
-
-  try {
-    invoice = await invoiceSchema.validate(req.body);
-  } catch (err: any) {
-    res.status(400).json({ message: "validate error", errors: err.errors });
-    return;
-  }
 
   // create invoice
   let user = req.user!;
@@ -118,38 +88,8 @@ const deleteInvoice: Handler = async (req, res) => {
 
 const updateInvoice: Handler = async (req, res) => {
   let { invoiceId } = req.params;
-  let updateInvoiceSchema = object({
-    billFromCity: string(),
-    billFromStreetAddress: string(),
-    billFromPostCode: string(),
-    country: string(),
-    clientName: string(),
-    clientEmail: string().email(),
-    clientStreetAddress: string(),
-    clientCity: string(),
-    clientPostCode: string(),
-    clientCountry: string(),
-    projectDescription: string(),
-    invoiceDate: string(),
-    itemList: array(
-      object({
-        name: string().required(),
-        quantity: number().required(),
-        price: number().required(),
-      })
-    ),
-  });
 
-  let invoice;
-
-  try {
-    invoice = await updateInvoiceSchema.validate(req.body);
-  } catch (err: any) {
-    return res.status(400).json({
-      message: "validation error",
-      errors: err.errors,
-    });
-  }
+  let invoice = req.body;
 
   try {
     let updatedInvoice = await dbClient.invoice.update({
