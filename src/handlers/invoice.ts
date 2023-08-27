@@ -64,7 +64,10 @@ const createInvoice: Handler = async (req, res) => {
         userId: userId,
       },
     });
-    res.status(200).json({ invoice: createdInvoice });
+    res.status(200).json({
+      invoice: createdInvoice,
+      message: "Invoice created successfully",
+    });
   } catch (err) {
     res
       .status(500)
