@@ -64,6 +64,7 @@ const createInvoice: Handler = async (req, res) => {
         userId: userId,
       },
     });
+    parseInvoiceItemList(createdInvoice);
     res.status(200).json({
       invoice: createdInvoice,
       message: "Invoice created successfully",
@@ -115,7 +116,7 @@ const updateInvoice: Handler = async (req, res) => {
         itemList: JSON.stringify(invoice.itemList),
       },
     });
-
+    parseInvoiceItemList(updatedInvoice);
     res.status(200).json({ invoice: updatedInvoice });
   } catch (err) {
     res.status(500).json({ message: "fatal error" });
