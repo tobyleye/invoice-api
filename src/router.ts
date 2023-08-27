@@ -8,25 +8,37 @@ import {
   validateSignup,
 } from "./validations";
 import { verifyToken } from "./middleware";
+import { notFound } from "./handlers/404";
 
 const router = Router();
 router.post("/signup", validateSignup, authHandlers.register);
 router.post("/login", validateLogin, authHandlers.login);
 
-router.use(verifyToken);
-
-router.post("/invoices/new", validateNewInvoice, invoiceHandlers.createInvoice);
-router.get("/invoices", invoiceHandlers.listInvoices);
-router.get("/invoices/:invoiceId", invoiceHandlers.getInvoice);
-router.delete("/invoices/:invoiceId/delete", invoiceHandlers.deleteInvoice);
+router.post(
+  "/invoices/new",
+  verifyToken,
+  validateNewInvoice,
+  invoiceHandlers.createInvoice
+);
+router.get("/invoices", verifyToken, invoiceHandlers.listInvoices);
+router.get("/invoices/:invoiceId", verifyToken, invoiceHandlers.getInvoice);
+router.delete(
+  "/invoices/:invoiceId/delete",
+  verifyToken,
+  invoiceHandlers.deleteInvoice
+);
 router.patch(
   "/invoices/:invoiceId/update",
+  verifyToken,
   validateInvoiceUpdate,
   invoiceHandlers.updateInvoice
 );
 router.post(
   "/invoices/:invoiceId/mark-as-paid",
+  verifyToken,
   invoiceHandlers.markInvoiceAsPaid
 );
+
+router.use(notFound);
 
 export default router;
