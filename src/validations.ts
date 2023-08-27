@@ -8,9 +8,11 @@ const BodyValidator = (schema: ObjectSchema<AnyObject>) => {
       req.body = await schema.validate(req.body);
       next();
     } catch (err: any) {
-      return res
-        .status(400)
-        .json({ message: "validation error", errors: err.errors });
+      return res.status(400).json({
+        message: "validation error",
+        errors: err.errors,
+        body: req.body,
+      });
     }
   };
 };
