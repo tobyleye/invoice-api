@@ -21,6 +21,7 @@ router.post(
   invoiceHandlers.createInvoice
 );
 router.get("/invoices", verifyToken, invoiceHandlers.listInvoices);
+router.get("/invoices/list", verifyToken, invoiceHandlers.listInvoices);
 router.get("/invoices/:invoiceId", verifyToken, invoiceHandlers.getInvoice);
 router.delete(
   "/invoices/:invoiceId/delete",
