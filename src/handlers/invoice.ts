@@ -39,7 +39,7 @@ const getInvoice: Handler = async (req, res) => {
 
 const createInvoice: Handler = async (req, res) => {
   let invoice = req.body;
-  let { saveAsDraft = false } = req.params;
+  let { saveAsDraft = false } = req.query;
 
   // create invoice
   let user = req.user!;
