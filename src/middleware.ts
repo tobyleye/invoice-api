@@ -11,7 +11,7 @@ export async function verifyToken(
 ) {
   let token = req.headers.authorization;
   if (!token) {
-    return res.status(401).json({ message: "auth token is required!" });
+    return res.status(401).json({ message: "ahh! auth token is required!" });
   }
 
   try {
