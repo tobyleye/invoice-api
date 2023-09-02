@@ -1,13 +1,30 @@
 import { dbClient } from "../db";
 import { Handler } from "../types";
 
-let parseInvoiceItemList = (invoice: any) => {
+type InvoiceItem = {
+  name: string;
+  quantity: number;
+  price: number;
+};
+
+const parseInvoiceItemList = (invoice: any) => {
   try {
     invoice.itemList = JSON.parse(invoice.itemList);
   } catch (err) {
     invoice.itemList = [];
   }
   return invoice;
+};
+
+const getInvoiceItemList = (invoice: any) => {
+  let { itemList = [] } = invoice;
+
+  itemList = itemList.map(({ name, quantity, price }: InvoiceItem) => ({
+    name,
+    quantity,
+    price,
+  }));
+  return itemList;
 };
 
 const listInvoices: Handler = async (req, res) => {
@@ -44,6 +61,9 @@ const createInvoice: Handler = async (req, res) => {
   // create invoice
   let user = req.user!;
   let userId = user.id;
+
+  let itemList = getInvoiceItemList(invoice);
+
   try {
     const createdInvoice = await dbClient.invoice.create({
       data: {
@@ -58,7 +78,7 @@ const createInvoice: Handler = async (req, res) => {
         clientCity: invoice.clientCity,
         clientPostCode: invoice.clientPostCode,
         clientCountry: invoice.clientCountry,
-        itemList: JSON.stringify(invoice.itemList),
+        itemList: JSON.stringify(itemList),
         invoiceDate: new Date(invoice.invoiceDate),
         projectDescription: invoice.projectDescription,
         userId: userId,
@@ -95,6 +115,8 @@ const updateInvoice: Handler = async (req, res) => {
 
   let invoice = req.body;
 
+  let itemList = getInvoiceItemList(invoice);
+
   try {
     let updatedInvoice = await dbClient.invoice.update({
       where: {
@@ -113,13 +135,18 @@ const updateInvoice: Handler = async (req, res) => {
         clientCountry: invoice.clientCountry,
         invoiceDate: invoice.invoiceDate,
         projectDescription: invoice.projectDescription,
-        itemList: JSON.stringify(invoice.itemList),
+        itemList: JSON.stringify(itemList),
       },
     });
     parseInvoiceItemList(updatedInvoice);
     res.status(200).json({ invoice: updatedInvoice });
-  } catch (err) {
-    res.status(500).json({ message: "fatal error" });
+  } catch (err: any) {
+    console.error(`invoice<${invoiceId}> update error:`, err);
+    res
+      .status(500)
+      .json({
+        message: `sorry, we cant update your invoice right now. try again?`,
+      });
   }
 };
 

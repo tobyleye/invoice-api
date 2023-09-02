@@ -32,6 +32,8 @@ export async function verifyToken(
     }
     throw new Error("token is invalid");
   } catch (err: any) {
-    res.status(401).json({ message: err.message });
+    res.status(401).json({
+      message: `Sorry, we couldn't validate your token because (${err.message})`,
+    });
   }
 }
