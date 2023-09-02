@@ -34,7 +34,9 @@ export const register: Handler = async (req, res, next) => {
         createdAt: true,
       },
     });
-    let token = jwt.sign(createdUser.id, config.JWT_SECRET_KEY);
+    let token = jwt.sign(createdUser.id, config.JWT_SECRET_KEY, {
+      expiresIn: "7d",
+    });
 
     return res.status(200).json({
       data: {
@@ -58,18 +60,20 @@ export const login: Handler = async (req, res) => {
       },
     });
 
-    let credentialsValid = false;
-
-    if (searchedUser) {
-      credentialsValid = await bcrypt.compare(
-        user.password,
-        searchedUser.password
-      );
+    if (!searchedUser) {
+      return res.status(401).json({
+        message: "Account does not exist",
+      });
     }
+
+    let credentialsValid = await bcrypt.compare(
+      user.password,
+      searchedUser.password
+    );
 
     if (credentialsValid === false) {
       return res.status(401).json({
-        message: `account doesn't exist`,
+        message: `Email or password not correct`,
       });
     }
 
