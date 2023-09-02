@@ -37,3 +37,26 @@ export async function verifyToken(
     });
   }
 }
+
+export async function verifyInvoiceExists(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    let { invoiceId } = req.params;
+    let invoiceFound = await dbClient.invoice.findFirst({
+      where: {
+        id: invoiceId,
+      },
+    });
+    console.log(invoiceFound);
+    if (!invoiceFound) {
+      return res.status(404).json({ message: "invoice not found " });
+    }
+    next();
+  } catch (err) {
+    console.error("error loading invoice: ", err);
+    res.status(500).json({ message: "an error occurred loading invoice" });
+  }
+}

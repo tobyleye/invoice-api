@@ -106,6 +106,7 @@ const deleteInvoice: Handler = async (req, res) => {
     });
     res.status(200).send();
   } catch (err) {
+    console.error("error deleting invoice", err);
     res.status(500).json({ message: "fatal error occurred" });
   }
 };
@@ -133,7 +134,7 @@ const updateInvoice: Handler = async (req, res) => {
         clientCity: invoice.clientCity,
         clientPostCode: invoice.clientPostCode,
         clientCountry: invoice.clientCountry,
-        invoiceDate: invoice.invoiceDate,
+        invoiceDate: new Date(invoice.invoiceDate),
         projectDescription: invoice.projectDescription,
         itemList: JSON.stringify(itemList),
       },
@@ -142,11 +143,9 @@ const updateInvoice: Handler = async (req, res) => {
     res.status(200).json({ invoice: updatedInvoice });
   } catch (err: any) {
     console.error(`invoice<${invoiceId}> update error:`, err);
-    res
-      .status(500)
-      .json({
-        message: `sorry, we cant update your invoice right now. try again?`,
-      });
+    res.status(500).json({
+      message: `sorry, we cant update your invoice right now. try again?`,
+    });
   }
 };
 

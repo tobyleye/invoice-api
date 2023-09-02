@@ -7,7 +7,7 @@ import {
   validateNewInvoice,
   validateSignup,
 } from "./validations";
-import { verifyToken } from "./middleware";
+import { verifyToken, verifyInvoiceExists } from "./middleware";
 import { notFound } from "./handlers/404";
 
 const router = Router();
@@ -20,23 +20,30 @@ router.post(
   validateNewInvoice,
   invoiceHandlers.createInvoice
 );
+
 router.get("/invoices", verifyToken, invoiceHandlers.listInvoices);
+
 router.get("/invoices/list", verifyToken, invoiceHandlers.listInvoices);
+
 router.get("/invoices/:invoiceId", verifyToken, invoiceHandlers.getInvoice);
+
 router.delete(
   "/invoices/:invoiceId/delete",
   verifyToken,
+  verifyInvoiceExists,
   invoiceHandlers.deleteInvoice
 );
 router.patch(
   "/invoices/:invoiceId/update",
   verifyToken,
   validateInvoiceUpdate,
+  verifyInvoiceExists,
   invoiceHandlers.updateInvoice
 );
 router.post(
   "/invoices/:invoiceId/mark-as-paid",
   verifyToken,
+  verifyInvoiceExists,
   invoiceHandlers.markInvoiceAsPaid
 );
 
